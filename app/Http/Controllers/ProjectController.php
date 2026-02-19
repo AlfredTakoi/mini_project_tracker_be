@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProjectStoreRequest;
 use App\Interfaces\ProjectRepositoryInterface;
 use Illuminate\Http\Request;
 use App\Http\Resources\ProjectResource;
@@ -83,7 +84,6 @@ class ProjectController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required',
-            'status' => 'required',
         ]);
         try {
             $project = $this->projectRepository->update($id, $validatedData); // Update
