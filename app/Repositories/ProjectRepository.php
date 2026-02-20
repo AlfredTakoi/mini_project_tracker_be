@@ -3,6 +3,7 @@
 namespace App\Repositories;
 use App\Interfaces\ProjectRepositoryInterface;
 use App\Models\Project;
+use App\Repositories\TaskRepository;
 use Illuminate\Support\Facades\DB;
 
 class ProjectRepository implements ProjectRepositoryInterface {
@@ -28,7 +29,15 @@ class ProjectRepository implements ProjectRepositoryInterface {
         }
 
         if ($execute) {
-            return $query->get();
+            $projects = $query->get();
+
+            // ensure project stats are recalculated before returning
+            $taskRepo = new TaskRepository();
+            foreach ($projects as $project) {
+                $taskRepo->recalcProject($project->id);
+            }
+
+            return $projects;
         }
 
         return $query;

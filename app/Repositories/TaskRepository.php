@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class TaskRepository implements TaskRepositoryInterface {
 
-    protected function recalcProject(int $projectId): void
+    public function recalcProject(int $projectId): void
     {
         $project = Project::find($projectId);
         if (!$project) {
@@ -16,24 +16,24 @@ class TaskRepository implements TaskRepositoryInterface {
         }
 
         $total_task        = Task::where('project_id', $projectId)->count();
-        $task_done         = Task::where('status', 'done')->count();
-        $task_draft        = Task::where('status', 'draft')->count();
-        $total_weight_done = Task::where('status', 'done')->sum('weight');
-        $total_weight_task = Task::sum('weight');
+        $task_done         = Task::where('project_id', $projectId)->where('status', 'done')->count();
+        $task_draft        = Task::where('project_id', $projectId)->where('status', 'draft')->count();
+        $total_weight_done = Task::where('project_id', $projectId)->where('status', 'done')->sum('weight');
+        $total_weight_task = Task::where('project_id', $projectId)->sum('weight');
 
         if ($total_task === 0) {
             $project->status = 'draft';
             $project->completion_progress = 0;
         } elseif ($task_done === $total_task) {
-            // semua selesai
+            // all done
             $project->status = 'done';
             $project->completion_progress = 100;
         } elseif ($task_draft > 0) {
-            // ada paling tidak satu draft (termasuk semua draft)
+            // at least 1 draft, so project is still draft
             $project->status = 'draft';
             $project->completion_progress = ($total_weight_done / $total_weight_task) * 100;
         } else {
-            // tidak ada draft, tidak semua done → in progress
+            // no draft, but not all done (in_progress)
             $project->status = 'in_progress';
             $project->completion_progress = ($total_weight_done / $total_weight_task) * 100;
         }
