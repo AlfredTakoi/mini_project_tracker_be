@@ -48,10 +48,12 @@ class TaskController extends Controller
             'status' => 'required',
             'weight' => 'required|integer',
             'project_id' => 'required|exists:projects,id',
+            'dependencies' => 'sometimes|array',
+            'dependencies.*' => 'exists:tasks,id',
         ]);
         try {
             $task = $this->taskRepository->create($validatedData);
-            return ResponseHelper::jsonResponse(true, 'Task berhasil dibuat', $task, 201); // 201 Created status
+            return ResponseHelper::jsonResponse(true, 'Task berhasil dibuat', new TaskResource($task), 201); // 201 Created status
         } catch (\Throwable $th) {
             return ResponseHelper::jsonResponse(false, 'Task gagal dibuat', null, 500);
         }
@@ -89,10 +91,12 @@ class TaskController extends Controller
             'name' => 'required',
             'status' => 'required',
             'weight' => 'required|integer',
+            'dependencies' => 'sometimes|array',
+            'dependencies.*' => 'exists:tasks,id',
         ]);
         try {
             $task = $this->taskRepository->update($id, $validatedData);
-            return ResponseHelper::jsonResponse(true, 'Task berhasil diupdate', $task, 200);
+            return ResponseHelper::jsonResponse(true, 'Task berhasil diupdate', new TaskResource($task), 200);
         } catch (\Throwable $th) {
             return ResponseHelper::jsonResponse(false, 'Task gagal diupdate', null, 500);
         }

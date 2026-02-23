@@ -17,4 +17,6 @@ interface TaskRepositoryInterface
     public function update(string $id, array $data);
 
     public function delete(string $id);
+
+    public function syncDependencies(string $id, array $dependencyIds);
 }
