@@ -73,7 +73,9 @@ class ProjectRepository implements ProjectRepositoryInterface {
         try {
             $project = Project::find($id);
             $project->name = $data['name'];
-            $project->status = $data['status'];
+            if (isset($data['status'])) {
+                $project->status = $data['status'];
+            }
             $project->completion_progress = 0;
             $project->save();
 
